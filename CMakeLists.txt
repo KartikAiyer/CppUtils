@@ -1,0 +1,13 @@
+cmake_minimum_required( VERSION 3.0.0 )
+project( CppUtil CXX )
+
+set( CPPUTIL_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src" PARENT_SCOPE ) 
+set( CPPUTIL_INC_DIR "${PROJECT_SOURCE_DIR}/inc" PARENT_SCOPE )
+set( CPPUTIL_TEST_DIR "${PROJECT_SOURCE_DIR}/tests" PARENT_SCOPE )
+
+
+file( GLOB SOURCES S{SOURCE_DIR}/*.cc ) 
+file( GLOB HEADERS ${INC_DIR}/*.h )
+
+
+
