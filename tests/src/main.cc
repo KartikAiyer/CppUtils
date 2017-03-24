@@ -21,45 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __ASHUTDOWNABLE_H__
-#define __ASHUTDOWNABLE_H__
 
-#include <future>
+#include <iostream>
+#include <gtest/gtest.h>
 
-namespace CppUtils {
+using namespace std;
 
-enum EShutdownStatus {
-  eSHUTDOWN_STATUS_NULL = 0,
-  eSHUTDOWN_STATUS_SUCCESS = 1,
-  eSHUTDOWN_STATUS_ERROR = 2,
-};
-
-using ShutdownFuture = std::future<EShutdownStatus>;
-
-class AShutdownable
+int main( int argc, char **argv ) 
 {
-public:
-  virtual ~AShutdownable()
-  { }
-
-  virtual ShutdownFuture Shutdown() = 0;
-};
-
-
-class AShutdownableImpl : public AShutdownable
-{
-public:
-  virtual ~AShutdownableImpl() { }
-
-protected:
-  ShutdownFuture GetShutdownFuture() { return m_shutdownPromise.get_future(); }
-  void SetShutdownStatus( EShutdownStatus status ) { m_shutdownPromise.set_value( status ); }
-
-private:
-  std::promise<EShutdownStatus> m_shutdownPromise;
-};
-
+  cout<<"============================================="<<endl;
+  cout<<"Running NeoLib tests..."<<endl;
+  cout<<"Run individual tests with option '--gtest_filter'"<<endl;
+  cout<<"example: $ ./tests --gtest_filter=NeoLibEntry.GetStatusUpdates"<<endl;
+  cout<<"============================================="<<endl;
+  ::testing::InitGoogleTest( &argc, argv );
+  return RUN_ALL_TESTS();
 }
-
-
-#endif // __ASHUTDOWNABLE_H__
