@@ -1,6 +1,6 @@
 # CppUtils
 
-A few constructs that I have found useful in coding C++ Applications
+A few constructs that I have found useful in coding C++ Libraries that depend only on STL
 
 ### Dispatch Thread
 This is a very handy mix-in to classes which basically provides a worker thread. If you mix this class into your class 
