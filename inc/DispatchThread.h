@@ -55,8 +55,10 @@ public:
   {
     if ( m_spThread ) {
       PostToDispatch( [this]() { m_keepRunning = false; } );
-      m_spThread->join();
-      m_spThread.reset();
+      if( this_thread::get_id() != m_spThread->get_id() ) {
+        m_spThread->join();
+        m_spThread.reset();
+      }
     }
   }
 

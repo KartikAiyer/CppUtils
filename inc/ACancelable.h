@@ -36,7 +36,7 @@ public:
   virtual ~ACancelable()
   { }
 
-  virtual void CancelWith( std::shared_ptr<ACancelableToken> spToken ) const = 0;
+  virtual void CancelWith( std::shared_ptr<ACancelableToken> spToken ) = 0;
 };
 
 class ACancelableToken
@@ -49,7 +49,7 @@ public:
 class ACancelableTokenImpl : public ACancelableToken, public std::enable_shared_from_this<ACancelableTokenImpl>
 {
 public:
-  ACancelableTokenImpl( const ACancelable& cancelable ) : m_cancelable{ cancelable }
+  ACancelableTokenImpl( ACancelable& cancelable ) : m_cancelable{ cancelable }
   { }
 
   virtual ~ACancelableTokenImpl()
@@ -61,7 +61,7 @@ public:
   }
 
 protected:
-  const ACancelable& m_cancelable;
+  ACancelable& m_cancelable;
 };
 
 
@@ -69,7 +69,7 @@ template<typename U>
 class ATypedCancelableToken : public ACancelableTokenImpl
 {
 public:
-  ATypedCancelableToken( const ACancelable& cancellable,
+  ATypedCancelableToken( ACancelable& cancellable,
                           U value ) :
       ACancelableTokenImpl{ cancellable }, m_msgType{ value }
   { }
