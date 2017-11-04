@@ -61,7 +61,7 @@ public:
     return retval;
   }
 
-  virtual void CancelWith( std::shared_ptr<ACancelableToken> spBaseToken ) const
+  virtual void CancelWith( std::shared_ptr<ACancelableToken> spBaseToken )
   {
     try {
       auto spToken = std::dynamic_pointer_cast<ATypedCancelableToken<U>>( spBaseToken );
@@ -97,7 +97,7 @@ protected:
   class AmnCancellableToken : public ATypedCancelableToken<U>
   {
   public:
-    AmnCancellableToken( const ACancelable& cancellable,
+    AmnCancellableToken( ACancelable& cancellable,
                          U msgType,
                          typename std::list<std::pair<NotificationFn,std::shared_ptr<AmnCancellableToken>>>::iterator it ) :
         ATypedCancelableToken<U>{ cancellable, msgType }, m_it{ it } { }
@@ -122,7 +122,7 @@ public:
     return retval;
   }
 
-  virtual void CancelWith( std::shared_ptr<ACancelableToken> spBaseToken ) const
+  virtual void CancelWith( std::shared_ptr<ACancelableToken> spBaseToken )
   {
     try {
       auto spToken = std::dynamic_pointer_cast<AmnCancellableToken>( spBaseToken );
