@@ -25,6 +25,7 @@
  * http://stackoverflow.com/questions/147267/easy-way-to-use-variables-of-enum-types-as-string-in-c#202511
  */
 
+#include <string>
 //expansion macro for enum value definition
 #define ENUM_VALUE( name, assign ) name assign,
 
