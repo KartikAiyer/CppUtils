@@ -34,19 +34,36 @@
 
 #define ENUM_STRCMP( name, assign ) if( !strcmp( str, #name ) ) return name;
 
-//declare the access funtion and enum values
-#define DECLARE_ENUM( EnumType, ENUM_DEF ) \
+#define DECLARE_ENUM_NONMEMBER( EnumType, ENUM_DEF ) \
   enum EnumType { \
     ENUM_DEF( ENUM_VALUE ) \
   };\
-  const char* GetString( EnumType blah )\
+  static inline const char* GetString( EnumType blah )\
   {\
      switch( blah ) {\
        ENUM_DEF(ENUM_CASE)\
        default: return "";\
      }\
   }\
-  EnumType Get##EnumType##Value( const char* str )\
+  static inline EnumType Get##EnumType##Value( const char* str )\
+  {\
+     ENUM_DEF(ENUM_STRCMP)\
+     return (EnumType)0;\
+  }
+
+//declare the access funtion and enum values
+#define DECLARE_ENUM( EnumType, ENUM_DEF ) \
+  enum EnumType { \
+    ENUM_DEF( ENUM_VALUE ) \
+  };\
+  inline const char* GetString( EnumType blah ) const\
+  {\
+     switch( blah ) {\
+       ENUM_DEF(ENUM_CASE)\
+       default: return "";\
+     }\
+  }\
+  inline EnumType Get##EnumType##Value( const char* str ) const\
   {\
      ENUM_DEF(ENUM_STRCMP)\
      return (EnumType)0;\
