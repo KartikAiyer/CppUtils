@@ -38,7 +38,7 @@
   enum EnumType { \
     ENUM_DEF( ENUM_VALUE ) \
   };\
-  static inline const char* GetString( EnumType blah )\
+  static inline const char* GetString( const EnumType blah )\
   {\
      switch( blah ) {\
        ENUM_DEF(ENUM_CASE)\
@@ -56,7 +56,7 @@
   enum EnumType { \
     ENUM_DEF( ENUM_VALUE ) \
   };\
-  inline const char* GetString( EnumType blah ) const\
+  inline const char* GetString( const EnumType blah ) const\
   {\
      switch( blah ) {\
        ENUM_DEF(ENUM_CASE)\
