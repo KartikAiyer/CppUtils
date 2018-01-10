@@ -64,6 +64,27 @@ protected:
   ACancelable& m_cancelable;
 };
 
+class ACancelableTokenSharedImpl : public ACancelableToken,
+                                   public std::enable_shared_from_this<ACancelableTokenSharedImpl>
+{
+public:
+  ACancelableTokenSharedImpl( std::shared_ptr<ACancelable> cancelable ) : m_cancelable{ cancelable }
+  { }
+
+  virtual ~ACancelableTokenSharedImpl()
+  { }
+
+  virtual void Cancel()
+  {
+    if( !m_cancelable.expired() ) {
+      auto sp = m_cancelable.lock();
+      sp->CancelWith( shared_from_this() );
+    }
+  }
+
+protected:
+  std::weak_ptr<ACancelable> m_cancelable;
+};
 
 template<typename U>
 class ATypedCancelableToken : public ACancelableTokenImpl
