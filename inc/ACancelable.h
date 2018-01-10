@@ -83,8 +83,10 @@ public:
 
 #define LOCK_AND_CANCEL( tok )\
 do{\
-auto sp = (tok).lock();\
-if( sp ) sp->Cancel();\
+  if( !tok.expired() ){\
+    auto sp = (tok).lock();\
+    if( sp ) sp->Cancel();\
+  }\
 }while( 0 )
 
 #if 0
