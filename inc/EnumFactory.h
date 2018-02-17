@@ -31,7 +31,7 @@
 
 //expansion macro for enum to string conversion
 #define ENUM_CASE( name, assign ) case name: return #name;
-
+#define ENUM_VAL_CASE( name, assign ) case name: return name;
 #define ENUM_STRCMP( name, assign ) if( !strcmp( str, #name ) ) return name;
 
 #define DECLARE_ENUM_NONMEMBER( EnumType, ENUM_DEF ) \
@@ -49,6 +49,13 @@
   {\
      ENUM_DEF(ENUM_STRCMP)\
      return (EnumType)0;\
+  }\
+  static inline EnumType Get##EnumType##Value( const uint32_t value )\
+  {\
+    switch( value ) {\
+    ENUM_DEF(ENUM_VAL_CASE)\
+    default: return (EnumType)0;\
+    }\
   }
 
 //declare the access funtion and enum values
