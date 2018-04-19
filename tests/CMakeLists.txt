@@ -12,4 +12,5 @@ file( GLOB CPPUTIL_TEST_SOURCES "${CPPUTIL_TEST_SOURCE_DIR}/*.cc"
 
 add_executable( tests ${CPPUTIL_TEST_SOURCES} )
 target_link_libraries( tests gtest CppUtils )
+target_compile_features( tests PRIVATE cxx_std_11 )
 
