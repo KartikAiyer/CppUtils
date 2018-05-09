@@ -11,7 +11,7 @@
  * This is almost entirely based on the implementation found at
  * https://blogs.msdn.microsoft.com/gpalem/2008/06/19/tracking-c-variable-state-changes/
  * The only change is switching the callbacks to use lambdas and using the type traits
- * from std instead of Loki.
+ * from std instead of Loki. Also the original code didn't compile, so I did fix that too.
  */
 namespace CppUtils
 {
@@ -95,7 +95,6 @@ namespace CppUtils
     using ClassType = typename IsClassType<T>::ResultantType;
     using PredefinedType = typename IsPredefinedType<T>::ResultantType;
 
-    enum { IsClass = std::is_class<T>::value };
     using ValueChangedFn = std::function<void( ETrackedOps op, const T& newValue, std::unique_ptr<T> oldValue )>;
     using ValueChangingFn = std::function<bool( ETrackedOps op, const T& newValue, std::unique_ptr<T> oldValue )>;
   protected:
@@ -155,35 +154,7 @@ namespace CppUtils
 
     void SubscribeChanged( ValueChangedFn fn ) { m_valueChanged = fn; }
     void SubscribeChanging( ValueChangingFn fn ) { m_valueChanging = fn; }
-/*
-  protected:
-    template<typename U, typename TypeSelect>
-    inline bool Func_Eq( const U &other, type2type<TypeSelect> )
-    {
-      return ClassType::operator==( other );
-    }
-    template<typename U>
-    inline bool Func_Eq( const U &other, type2type<EmptyType> )
-    {
-      return ( m_data == other );
-    }
-    template<typename U, typename TypeSelect>
-    inline bool Func_Eq( const Property<U> &other, type2type<TypeSelect> )
-    {
-      return ( ClassType::operator==( dynamic_cast<const U>( other ) ) );
-    }
-    template<typename U>
-    inline bool Func_Eq( const Property<U> &other, type2type<EmptyType> )
-    {
-      return ( m_data == other.m_data );
-    }
-  public:
-    template<typename U>
-    inline bool operator==( const U &other ) const
-    {
-      return Func_Eq( other, type2type<ClassType>() );
-    }
-*/
+
 #define OVERLOAD_COMPARISON_OPERATOR( operator_func, DATA_OP, op_name )\
   protected:\
     template<typename U, typename TypeSelect>\
@@ -317,7 +288,7 @@ namespace CppUtils
   public:\
     inline Property operator_func(int) \
     {\
-      T retval = *(dynamic_cast<T*>(this));\
+      T retval = (dynamic_cast<T&>(*this));\
       Func_##OP_FUNC_CTX( type2type<ClassType>() );\
       return retval;\
     }
