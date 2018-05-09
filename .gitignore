@@ -3,3 +3,4 @@ build_debug
 buildX
 .idea
 cmake-*
+.DS_*

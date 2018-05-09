@@ -155,6 +155,70 @@ namespace CppUtils
 
     void SubscribeChanged( ValueChangedFn fn ) { m_valueChanged = fn; }
     void SubscribeChanging( ValueChangingFn fn ) { m_valueChanging = fn; }
+/*
+  protected:
+    template<typename U, typename TypeSelect>
+    inline bool Func_Eq( const U &other, type2type<TypeSelect> )
+    {
+      return ClassType::operator==( other );
+    }
+    template<typename U>
+    inline bool Func_Eq( const U &other, type2type<EmptyType> )
+    {
+      return ( m_data == other );
+    }
+    template<typename U, typename TypeSelect>
+    inline bool Func_Eq( const Property<U> &other, type2type<TypeSelect> )
+    {
+      return ( ClassType::operator==( dynamic_cast<const U>( other ) ) );
+    }
+    template<typename U>
+    inline bool Func_Eq( const Property<U> &other, type2type<EmptyType> )
+    {
+      return ( m_data == other.m_data );
+    }
+  public:
+    template<typename U>
+    inline bool operator==( const U &other ) const
+    {
+      return Func_Eq( other, type2type<ClassType>() );
+    }
+*/
+#define OVERLOAD_COMPARISON_OPERATOR( operator_func, DATA_OP, op_name )\
+  protected:\
+    template<typename U, typename TypeSelect>\
+    inline bool Func_##op_name( const U &other, type2type<TypeSelect> ) const\
+    {\
+      return ClassType::operator_func( other );\
+    }\
+    template<typename U>\
+    inline bool Func_##op_name( const U &other, type2type<EmptyType> ) const\
+    {\
+      return ( m_data DATA_OP other );\
+    }\
+    template<typename U, typename TypeSelect>\
+    inline bool Func_##op_name( const Property<U> &other, type2type<TypeSelect> ) const\
+    {\
+      return ( ClassType::operator_func( dynamic_cast<const U&>( other ) ) );\
+    }\
+    template<typename U>\
+    inline bool Func_##op_name( const Property<U> &other, type2type<EmptyType> ) const\
+    {\
+      return ( m_data DATA_OP other.m_data );\
+    }\
+  public:\
+    template<typename U>\
+    inline bool operator_func( const U &other ) const\
+    {\
+      return Func_##op_name( other, type2type<ClassType>() );\
+    }
+
+    OVERLOAD_COMPARISON_OPERATOR( operator==, ==, Eq )
+    OVERLOAD_COMPARISON_OPERATOR( operator!=, !=, NotEq )
+    OVERLOAD_COMPARISON_OPERATOR( operator<=, <= , LessEq )
+    OVERLOAD_COMPARISON_OPERATOR( operator>=, >=, GreaterEq )
+    OVERLOAD_COMPARISON_OPERATOR( operator<, <, Less )
+    OVERLOAD_COMPARISON_OPERATOR( operator>, >, Greater )
 
 #define OVERLOAD_BINARY_OPERATOR( operator_func, DATA_OP, OP_FUNC_CTX )\
     protected:\
@@ -217,6 +281,95 @@ namespace CppUtils
     OVERLOAD_BINARY_OPERATOR( operator<<=, <<=, eOpLShiftAssign )
     OVERLOAD_BINARY_OPERATOR( operator>>=, >>=, eOpRShiftAssign )
 
+#define OVERLOAD_POST_OPERATOR( operator_func, DATA_OP, OP_FUNC_CTX )\
+  protected:\
+    template<typename TypeSelect>\
+    inline void Func_##OP_FUNC_CTX( type2type<TypeSelect> )\
+    {\
+      std::unique_ptr<T> oldVal{ new T{ *( dynamic_cast<T*>(this) ) } };\
+      bool shouldChange = true;\
+      if( m_valueChanging ) {\
+        shouldChange = m_valueChanging( OP_FUNC_CTX, 1, move(oldVal) );\
+      }\
+      if( shouldChange ){\
+        oldVal.reset( new T{ *( dynamic_cast<T*>(this) ) } );\
+        ClassType::operator_func(0);\
+        if( m_valueChanged ) {\
+          m_valueChanged( OP_FUNC_CTX, *( dynamic_cast<T*>( this ) ), move( oldVal ) );\
+        }\
+      }\
+    }\
+    inline void Func_##OP_FUNC_CTX( type2type<EmptyType> )\
+    {\
+      std::unique_ptr<T> oldVal{ new T{ m_data } };\
+      bool shouldChange = true;\
+      if( m_valueChanging ) {\
+        shouldChange = m_valueChanging( OP_FUNC_CTX, 1, move( oldVal ) );\
+      }\
+      if( shouldChange ){\
+        oldVal.reset( new T{ *(dynamic_cast<T*>(this) ) } );\
+        m_data DATA_OP;\
+        if( m_valueChanged ) {\
+          m_valueChanged( OP_FUNC_CTX, m_data, move( oldVal ) );\
+        }\
+      }\
+    }\
+  public:\
+    inline Property operator_func(int) \
+    {\
+      T retval = *(dynamic_cast<T*>(this));\
+      Func_##OP_FUNC_CTX( type2type<ClassType>() );\
+      return retval;\
+    }
+
+#define OVERLOAD_PRE_OPERATOR( operator_func, DATA_OP, OP_FUNC_CTX )\
+  protected:\
+    template<typename TypeSelect>\
+    inline void Func_##OP_FUNC_CTX( type2type<TypeSelect> )\
+    {\
+      std::unique_ptr<T> oldVal{ new T{ *( dynamic_cast<T*>(this) ) } };\
+      bool shouldChange = true;\
+      if( m_valueChanging ) {\
+        shouldChange = m_valueChanging( OP_FUNC_CTX, 1, move( oldVal ) );\
+      }\
+      if( shouldChange ) {\
+        oldVal.reset( new T{ *(dynamic_cast<T*>(this) ) } );\
+        ClassType::operator_func();\
+        if( m_valueChanged ) {\
+          m_valueChanged( OP_FUNC_CTX, *( dynamic_cast<T*>( this ) ), move( oldVal ) );\
+        }\
+      }\
+    }\
+    inline void Func_##OP_FUNC_CTX( type2type<EmptyType> )\
+    {\
+      std::unique_ptr<T> oldVal{ new T{ m_data } };\
+      bool shouldChange = true;\
+      if( m_valueChanging ) {\
+        shouldChange = m_valueChanging( OP_FUNC_CTX, 1, move( oldVal ) );\
+      }\
+      if( shouldChange ) {\
+        oldVal.reset( new T{ *(dynamic_cast<T*>(this) ) } );\
+        DATA_OP m_data;\
+        if( m_valueChanged ) {\
+          m_valueChanged( OP_FUNC_CTX, m_data, move( oldVal ) );\
+        }\
+      }\
+    }\
+   public:\
+    inline Property & operator_func()\
+    {\
+      Func_##OP_FUNC_CTX( type2type<ClassType>() );\
+      return *this;\
+    }
+
+    OVERLOAD_POST_OPERATOR( operator++, ++, eOpPostIncrement );
+    OVERLOAD_PRE_OPERATOR( operator++, ++, eOpPreIncrement );
+
+    OVERLOAD_POST_OPERATOR( operator--, --, eOpPostDecrement );
+    OVERLOAD_PRE_OPERATOR( operator--, --, eOpPreDecrement );
+
+  public:
+    inline operator T() const { return m_data; }
   };
 }
 

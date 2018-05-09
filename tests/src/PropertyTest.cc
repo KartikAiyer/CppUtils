@@ -79,5 +79,100 @@ TEST( PopertyShould, WorkOnClassForAssign )
       ASSERT_TRUE( newVal == TestClass( 10, 456 ) );
     }
   } );
-
 }
+
+struct TestClass
+{
+  TestClass( int i = 0, int j = 0 ) : x{ i }, y{ j }
+  {}
+
+  TestClass( const TestClass& other ) : x{ other.x }, y{ other.y }
+  {};
+  int x, y;
+
+  bool operator==( const TestClass& other ) const
+  { return ( x == other.x && y == other.y ); }
+
+  inline TestClass& operator+=( const TestClass& other )
+  {
+    x += other.x;
+    y += other.y;
+    return *this;
+  }
+
+  inline TestClass& operator-=( const TestClass& other )
+  {
+    x -= other.x;
+    y -= other.y;
+    return *this;
+  }
+
+  inline TestClass& operator*=( const TestClass& other )
+  {
+    x *= other.x;
+    y *= other.y;
+    return *this;
+  }
+
+  inline TestClass& operator/=( const TestClass& other )
+  {
+    x /= other.x;
+    y /= other.y;
+    return *this;
+  }
+
+  inline TestClass operator++(int)
+  {
+    TestClass retval = *this;
+    x++;
+    y++;
+    return retval;
+  }
+  inline TestClass& operator++()
+  {
+    x++;
+    y++;
+    return *this;
+  }
+  inline TestClass operator--(int)
+  {
+    TestClass retval = *this;
+    x--;
+    y--;
+    return retval;
+  }
+  inline TestClass& operator--()
+  {
+    x--;
+    y--;
+    return *this;
+  }
+
+};
+
+TEST( PropertyShould, IncDecClass )
+{
+  Property<TestClass> p1{ TestClass{ 1, 2 } };
+  p1.SubscribeChanged( [ ] ( ETrackedOps ops, const TestClass& newVal, std::unique_ptr<TestClass> pOldVal ) {
+    ASSERT_TRUE( ops == eFunDestructor || ops == eOpPostIncrement );
+    if( ops == eOpPostIncrement ) {
+      ASSERT_EQ( newVal, TestClass( 2, 3 ) );
+      ASSERT_TRUE( pOldVal );
+      ASSERT_EQ( *pOldVal, TestClass( 1, 2 ) );
+    }
+  });
+  p1++;
+  p1.SubscribeChanged( [] ( ETrackedOps ops, const TestClass &newVal, std::unique_ptr<TestClass> pOldVal ) {
+    ASSERT_TRUE( ops == eFunDestructor || ops == eOpPostDecrement );
+    if( ops == eOpPostDecrement ) {
+      ASSERT_EQ( newVal, TestClass( 1, 2 ) );
+      ASSERT_TRUE( pOldVal );
+      ASSERT_EQ( *pOldVal, TestClass( 2, 3 ) );
+    }
+  });
+  auto p2 = p1--;
+  ASSERT_EQ( p2, TestClass( 2, 3 ) );
+  auto p3 = p2;
+  ASSERT_EQ( p2, p3 );
+}
+
