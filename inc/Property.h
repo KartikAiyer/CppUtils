@@ -99,8 +99,8 @@ namespace CppUtils
     using ValueChangingFn = std::function<bool( ETrackedOps op, const T& newValue, std::unique_ptr<T> oldValue )>;
   protected:
     PredefinedType m_data;
-    ValueChangingFn m_valueChanging;
     ValueChangedFn m_valueChanged;
+    ValueChangingFn m_valueChanging;
 
     template<typename CType>
     inline void Constructor( ETrackedOps op, type2type<CType> )
