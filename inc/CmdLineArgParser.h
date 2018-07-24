@@ -125,7 +125,7 @@ public:
    * The result of the Parse Operation.
    * @return
    */
-  virtual const CmdLineParseResult Status() const = 0;
+  virtual CmdLineParseResult Status() const = 0;
 
 };
 

@@ -56,7 +56,7 @@ public:
       m_nonOptions.push_back( option );
     }
 
-    const CmdLineParseResult Status() const
+    CmdLineParseResult Status() const
     { return status; }
 
     friend class CmdLineParser;
