@@ -17,7 +17,7 @@ add_library( CppUtils STATIC ${CPPUTIL_SOURCES} ${CPPUTIL_HEADERS} )
 target_compile_features( CppUtils PRIVATE cxx_std_11 )
 include_directories( ${CPPUTIL_INC_DIR} )
 
-#if( ${CPPUTIL_BUILD_TESTS} )
+if( ${CPPUTIL_BUILD_TESTS} )
   add_subdirectory( tests )
-#endif( ${CPPUTIL_BUILD_TESTS} )
+endif( ${CPPUTIL_BUILD_TESTS} )
 

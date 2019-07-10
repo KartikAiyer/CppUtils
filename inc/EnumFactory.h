@@ -26,6 +26,7 @@
  */
 
 #include <string>
+#include <cstring>
 //expansion macro for enum value definition
 #define ENUM_VALUE( name, assign ) name assign,
 
