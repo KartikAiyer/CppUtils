@@ -29,6 +29,7 @@
 #include <map>
 #include <list>
 #include <mutex>
+#include <functional>
 
 namespace CppUtils {
 
