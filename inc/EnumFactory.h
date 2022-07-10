@@ -44,18 +44,6 @@
        ENUM_DEF(ENUM_CASE)\
        default: return "";\
      }\
-  }\
-  static inline EnumType Get##EnumType##Value( const char* str )\
-  {\
-     ENUM_DEF(ENUM_STRCMP)\
-     return (EnumType)0;\
-  }\
-  static inline EnumType Get##EnumType##Value( const uint32_t value )\
-  {\
-    switch( value ) {\
-    ENUM_DEF(ENUM_VAL_CASE)\
-    default: return (EnumType)0;\
-    }\
   }
 
 //declare the access funtion and enum values
@@ -69,10 +57,5 @@
        ENUM_DEF(ENUM_CASE)\
        default: return "";\
      }\
-  }\
-  inline EnumType Get##EnumType##Value( const char* str ) const\
-  {\
-     ENUM_DEF(ENUM_STRCMP)\
-     return (EnumType)0;\
   }
 
